@@ -1,4 +1,5 @@
 import os
+import redis
 
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -8,6 +9,7 @@ from flask_jwt_extended import JWTManager
 from blocklist import BLOCKLIST
 from db import db
 from dotenv import load_dotenv
+from rq import Queue
 
 from resources.breads import blp_breads as BreadsSegmentBlueprint
 from resources.bakeries import blp_bakeries as BakeriesSegmentBlueprint
@@ -19,6 +21,10 @@ def create_app(db_url=None):
     app = Flask(__name__)
     load_dotenv()
 
+    connection = redis.from_url(
+        os.getenv("RADIS_URL")
+    )
+    app.queue = Queue("emails", connection=connection)
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Breads REST API"
     app.config["API_VERSION"] = "v1"

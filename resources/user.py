@@ -1,3 +1,4 @@
+from flask import current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
@@ -13,7 +14,7 @@ from db import db
 from models import UserModel
 from schemas import UserSchema, UserRegisterSchema
 from blocklist import BLOCKLIST
-from emails import send_message
+from emails import send_user_registration_email
 from sqlalchemy import or_
 
 blp_users = Blueprint("Users", "users", description="Operations in users.")
@@ -41,11 +42,7 @@ class UserRegister(MethodView):
         db.session.add(user)
         db.session.commit()
 
-        send_message(
-            to=user.email,
-            subject="Successfully signed up",
-            text="Welcome! Thank you for signing up to the Breads Rest API!"
-        )
+        current_app.queue.enqueue(send_user_registration_email, user.email, user.username)
 
         return {"message": "User created successfully."}, 201
 
