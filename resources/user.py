@@ -41,7 +41,7 @@ class UserRegister(MethodView):
         db.session.add(user)
         db.session.commit()
 
-        send_simple_message(
+        send_message(
             to=user.email,
             subject="Successfully signed up",
             text="Welcome! Thank you for signing up to the Breads Rest API!"
