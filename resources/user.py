@@ -13,7 +13,7 @@ from db import db
 from models import UserModel
 from schemas import UserSchema, UserRegisterSchema
 from blocklist import BLOCKLIST
-from emails import send_simple_message
+from emails import send_message
 from sqlalchemy import or_
 
 blp_users = Blueprint("Users", "users", description="Operations in users.")
