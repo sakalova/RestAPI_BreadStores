@@ -15,25 +15,25 @@ template_env = jinja2.Environment(loader=template_loader)
 
 
 def render_template(template_filename, **context):
-	return template_env.get_template(template_filename).render(**context)
+    return template_env.get_template(template_filename).render(**context)
 
 
 def send_message(to: str, subject: str, text: str, html: str) -> requests.Response:
-	url = f"{MAILGUN_BASE_URL}/{MAILGUN_DOMAIN_NAME}/messages"
-	data = {
-		"from": f"Maria <postmaster@{MAILGUN_DOMAIN_NAME}>",
-		"to": [to],
-		"subject": subject,
-		"text": text,
-		"html": html,
-	}
-	return requests.post(url, auth=("api", MAILGUN_API_KEY), data=data)
+    url = f"{MAILGUN_BASE_URL}/{MAILGUN_DOMAIN_NAME}/messages"
+    data = {
+        "from": f"Maria <postmaster@{MAILGUN_DOMAIN_NAME}>",
+        "to": [to],
+        "subject": subject,
+        "text": text,
+        "html": html,
+    }
+    return requests.post(url, auth=("api", MAILGUN_API_KEY), data=data)
 
 
 def send_user_registration_email(email: str, username: str):
-	return send_message(
-		email,
-		"Successfully signed up",
-		f"Welcome, {username}! Thank you for signing up to the Breads Rest API! Enjoy our service!",
-		render_template("email/registration.html", username=username),
-	)
+    return send_message(
+        email,
+        "Successfully signed up",
+        f"Welcome, {username}! Thank you for signing up to the Breads Rest API! Enjoy our service!",
+        render_template("email/registration.html", username=username),
+    )

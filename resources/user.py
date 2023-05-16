@@ -1,4 +1,6 @@
-from flask import current_app
+import os
+import redis
+
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
@@ -16,8 +18,17 @@ from schemas import UserSchema, UserRegisterSchema
 from blocklist import BLOCKLIST
 from emails import send_user_registration_email
 from sqlalchemy import or_
+from rq import Queue
+from dotenv import load_dotenv
+
+load_dotenv()
 
 blp_users = Blueprint("Users", "users", description="Operations in users.")
+connection = redis.from_url(
+    os.getenv("REDIS_URL")
+)  # Get this from Render.com or run in Docker
+
+queue = Queue("emails", connection=connection)
 
 
 @blp_users.route("/register")
@@ -26,23 +37,23 @@ class UserRegister(MethodView):
     def post(self, user_data):
         """Create a new user and add to database."""
         if UserModel.query.filter(
-                or_(
-                    UserModel.username == user_data["username"],
-                    UserModel.email == user_data["email"]
-                )
+            or_(
+                UserModel.username == user_data["username"],
+                UserModel.email == user_data["email"],
+            )
         ).first():
             abort(409, message="A user with that username or email already exists.")
 
         user = UserModel(
             username=user_data["username"],
             password=pbkdf2_sha256.hash(user_data["password"]),
-            email=user_data["email"]
+            email=user_data["email"],
         )
 
         db.session.add(user)
         db.session.commit()
 
-        current_app.queue.enqueue(send_user_registration_email, user.email, user.username)
+        queue.enqueue(send_user_registration_email, user.email, user.username)
 
         return {"message": "User created successfully."}, 201
 
@@ -69,7 +80,6 @@ class User(MethodView):
 
 @blp_users.route("/login")
 class UserLogin(MethodView):
-
     @blp_users.arguments(UserSchema)
     def post(self, user_data):
         """Log in the user."""
@@ -87,7 +97,6 @@ class UserLogin(MethodView):
 
 @blp_users.route("/logout")
 class UserLogout(MethodView):
-
     @jwt_required()
     def post(self):
         """Log out the user."""
@@ -98,7 +107,6 @@ class UserLogout(MethodView):
 
 @blp_users.route("/refresh")
 class TokenRefresh(MethodView):
-
     @jwt_required(refresh=True)
     def post(self):
         new_token = create_access_token(identity=get_jwt_identity(), fresh=False)
