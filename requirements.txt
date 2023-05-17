@@ -48,6 +48,7 @@ types-passlib==1.7.7.12
 types-pyOpenSSL==23.1.0.3
 types-redis==4.5.5.2
 types-requests==2.30.0.0
+types-smorest==1.1.2
 types-SQLAlchemy==1.4.53.38
 types-urllib3==1.26.25.13
 typing_extensions==4.5.0
