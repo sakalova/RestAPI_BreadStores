@@ -24,9 +24,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 blp_users = Blueprint("Users", "users", description="Operations in users.")
-connection = redis.from_url(
-    os.getenv("REDIS_URL")
-)  # Get this from Render.com or run in Docker
+
+url = os.getenv("REDIS_URL")
+
+if url is None:
+    raise ValueError("Redis url must not be None.")
+
+connection = redis.from_url(url)  # Get this from Render.com or run in Docker
 
 queue = Queue("emails", connection=connection)
 
