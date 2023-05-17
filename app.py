@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 import os
-import redis
 
 from flask import Flask, jsonify
 from flask_migrate import Migrate
@@ -16,12 +15,9 @@ from resources.bakeries import blp_bakeries as BakeriesSegmentBlueprint
 from resources.tags import blp_tags as TagsSegmentBlueprint
 from resources.user import blp_users as UserBlueprint
 
+from models.tokenblocklist_model import TokenBlocklistModel
 
-# Setup redis connection for storing the blocklisted tokens.
-# So that a restart does not cause application to forget that a JWT was revoked.
-JWT_REDIS_BLOCKLIST = redis.StrictRedis(
-    host="localhost", port=6379, db=0, decode_responses=True
-)
+
 JWT_ACCESS_EXPIRES = timedelta(minutes=5)
 
 
@@ -66,8 +62,8 @@ def create_app(db_url=None):
         Check whether any JWT received is in the blocklist.
         """
         jti = jwt_payload["jti"]
-        token_in_redis = JWT_REDIS_BLOCKLIST.get(jti)
-        return token_in_redis is not None
+        token = db.session.query(TokenBlocklistModel.id).filter_by(jti=jti).scalar()
+        return token is not None
 
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):

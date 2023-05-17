@@ -58,3 +58,7 @@ class UserSchema(Schema):
 
 class UserRegisterSchema(UserSchema):
     email = fields.Str(required=True)
+
+
+class TokenBlocklistSchema(UserSchema):
+    pass

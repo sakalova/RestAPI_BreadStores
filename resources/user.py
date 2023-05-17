@@ -1,3 +1,7 @@
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+
 import os
 import redis
 
@@ -14,14 +18,20 @@ from flask_jwt_extended import (
 from passlib.hash import pbkdf2_sha256
 
 from db import db
-from models import UserModel
+from models import UserModel, TokenBlocklistModel
+
 from schemas import UserSchema, UserRegisterSchema
 from emails import send_user_registration_email
 from sqlalchemy import or_
 from rq import Queue
 from dotenv import load_dotenv
 
-from app import JWT_REDIS_BLOCKLIST
+# Setup redis connection for storing the blocklisted tokens.
+# So that a restart does not cause application to forget that a JWT was revoked.
+JWT_REDIS_BLOCKLIST = redis.StrictRedis(
+    host="localhost", port=6379, db=0, decode_responses=True
+)
+
 
 load_dotenv()
 
@@ -96,7 +106,11 @@ class UserLogin(MethodView):
         if user and pbkdf2_sha256.verify(user_data["password"], user.password):
             access_token = create_access_token(identity=user.id, fresh=True)
             refresh_token = create_refresh_token(identity=user.id)
-            return {"access_token": access_token, "refresh_token": refresh_token}, 200
+            return {
+                "access_token": access_token,
+                "refresh_token": refresh_token,
+                "message": "Successfully logged in. Access token created.",
+            }, 200
 
         abort(401, message="Invalid credentials.")
 
@@ -107,8 +121,10 @@ class UserLogout(MethodView):
     def post(self):
         """Log out the user."""
         jti = get_jwt()["jti"]
-        JWT_REDIS_BLOCKLIST.set(jti, "", ex=app.config["JWT_ACCESS_TOKEN_EXPIRES"])
-        return {"message": "Successfully logged out"}, 200
+        now = datetime.now(timezone.utc)
+        db.session.add(TokenBlocklistModel(jti=jti, created_at=now))
+        db.session.commit()
+        return {"message": "Successfully logged out. JWT revoked."}, 200
 
 
 @blp_users.route("/refresh")
@@ -117,5 +133,7 @@ class TokenRefresh(MethodView):
     def post(self):
         new_token = create_access_token(identity=get_jwt_identity(), fresh=False)
         jti = get_jwt()["jti"]
-        JWT_REDIS_BLOCKLIST.set(jti, "", ex=app.config["JWT_ACCESS_TOKEN_EXPIRES"])
-        return {"access_token": new_token}
+        now = datetime.now(timezone.utc)
+        db.session.add(TokenBlocklistModel(jti=jti, created_at=now))
+        db.session.commit()
+        return {"access_token": new_token, "message": "New token created."}
