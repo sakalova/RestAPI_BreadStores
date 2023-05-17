@@ -39,8 +39,6 @@ redis==4.5.5
 requests==2.30.0
 rq==1.14.1
 SQLAlchemy==2.0.9
-types-requests==2.30.0.0
-types-urllib3==1.26.25.13
 typing_extensions==4.5.0
 urllib3==2.0.2
 webargs==8.2.0
