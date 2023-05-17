@@ -47,7 +47,7 @@ class Tag(MethodView):
     """Segment related to the requested bakery tags."""
 
     @blp_tags.response(201, TagSchema)
-    def get(self, tag_id: int) -> TagModel:
+    def get(self, tag_id: int):
         """Get the requested tag."""
         tag = TagModel.query.get_or_404(tag_id)
         return tag

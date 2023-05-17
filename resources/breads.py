@@ -45,7 +45,7 @@ class BreadsSegment(MethodView):
 class BreadSegment(MethodView):
     @jwt_required()
     @blp_breads.response(200, BreadSchema)
-    def get(self, uid: int) -> BreadModel:
+    def get(self, uid: int):
         """Get requested bread."""
         bread = BreadModel.query.get_or_404(uid)
         return bread
@@ -70,7 +70,7 @@ class BreadSegment(MethodView):
 
     @blp_breads.arguments(BreadUpdateSchema)
     @blp_breads.response(200, BreadSchema)
-    def put(self, bread_data, uid) -> BreadModel:
+    def put(self, bread_data, uid):
         """Update bread."""
         bread = BreadModel.query.get_or_404(uid)
         bread.name = bread_data["name"]

@@ -1,7 +1,7 @@
 from db import db
 
 
-class BreadModel(db.Model):
+class BreadModel(db.Model):  # type: ignore
     __tablename__ = "all_breads"
 
     id = db.Column(db.Integer, primary_key=True)

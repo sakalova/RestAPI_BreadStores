@@ -1,7 +1,7 @@
 from db import db
 
 
-class BakeryModel(db.Model):
+class BakeryModel(db.Model):  # type: ignore
     __tablename__ = "all_bakeries"
 
     id = db.Column(db.Integer, primary_key=True)

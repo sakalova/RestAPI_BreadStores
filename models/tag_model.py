@@ -1,7 +1,7 @@
 from db import db
 
 
-class TagModel(db.Model):
+class TagModel(db.Model):  # type: ignore
     __tablename__ = "all_tags"
 
     id = db.Column(db.Integer, primary_key=True)
