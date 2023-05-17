@@ -1,6 +1,7 @@
 import os
 import redis
 
+from flask import current_app as app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
@@ -15,11 +16,12 @@ from passlib.hash import pbkdf2_sha256
 from db import db
 from models import UserModel
 from schemas import UserSchema, UserRegisterSchema
-from blocklist import BLOCKLIST
 from emails import send_user_registration_email
 from sqlalchemy import or_
 from rq import Queue
 from dotenv import load_dotenv
+
+from app import JWT_REDIS_BLOCKLIST
 
 load_dotenv()
 
@@ -105,7 +107,7 @@ class UserLogout(MethodView):
     def post(self):
         """Log out the user."""
         jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
+        JWT_REDIS_BLOCKLIST.set(jti, "", ex=app.config["JWT_ACCESS_TOKEN_EXPIRES"])
         return {"message": "Successfully logged out"}, 200
 
 
@@ -115,5 +117,5 @@ class TokenRefresh(MethodView):
     def post(self):
         new_token = create_access_token(identity=get_jwt_identity(), fresh=False)
         jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
+        JWT_REDIS_BLOCKLIST.set(jti, "", ex=app.config["JWT_ACCESS_TOKEN_EXPIRES"])
         return {"access_token": new_token}
