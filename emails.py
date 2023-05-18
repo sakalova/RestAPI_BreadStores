@@ -16,12 +16,12 @@ MAILGUN_BASE_URL = "https://api.mailgun.net/v3"
 MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
 MAILGUN_DOMAIN_NAME = os.getenv("MAILGUN_DOMAIN_NAME")
 
-# checkers
-if MAILGUN_API_KEY is None:
-    raise ValueError("Mailgun api key must not be None")
-
-if MAILGUN_DOMAIN_NAME is None:
-    raise ValueError("Mailgun domain name must not be None")
+# # checkers
+# if MAILGUN_API_KEY is None:
+#     raise ValueError("Mailgun api key must not be None")
+#
+# if MAILGUN_DOMAIN_NAME is None:
+#     raise ValueError("Mailgun domain name must not be None")
 
 
 AUTH = ("api", MAILGUN_API_KEY)
