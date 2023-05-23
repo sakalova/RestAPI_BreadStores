@@ -1,11 +1,7 @@
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-
 import os
 import redis
 
-from flask import current_app as app
+from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
@@ -18,7 +14,7 @@ from flask_jwt_extended import (
 from passlib.hash import pbkdf2_sha256
 
 from db import db
-from models import UserModel, TokenBlocklistModel
+from models import UserModel
 
 from schemas import UserSchema, UserRegisterSchema
 from emails import send_user_registration_email
@@ -26,11 +22,7 @@ from sqlalchemy import or_
 from rq import Queue
 from dotenv import load_dotenv
 
-# Setup redis connection for storing the blocklisted tokens.
-# So that a restart does not cause application to forget that a JWT was revoked.
-JWT_REDIS_BLOCKLIST = redis.StrictRedis(
-    host="localhost", port=6379, db=0, decode_responses=True
-)
+from utilities.token import add_token_to_database, revoke_jti_token
 
 
 load_dotenv()
@@ -74,6 +66,68 @@ class UserRegister(MethodView):
         return {"message": "User created successfully."}, 201
 
 
+@blp_users.route("/login")
+class UserLogin(MethodView):
+    @blp_users.arguments(UserSchema)
+    def post(self, user_data):
+        """Log in the user."""
+        username = user_data["username"]
+        password = user_data["password"]
+
+        user = UserModel.query.filter(UserModel.username == username).first()
+
+        if user and pbkdf2_sha256.verify(password, user.password):
+            access_token = create_access_token(identity=user.id, fresh=True)
+            refresh_token = create_refresh_token(identity=user.id)
+
+            add_token_to_database(access_token)
+            add_token_to_database(refresh_token)
+
+            return (
+                jsonify(
+                    {
+                        "access_token": access_token,
+                        "refresh_token": refresh_token,
+                        "message": "Successfully logged in. Access token created.",
+                    }
+                ),
+                200,
+            )
+
+        abort(401, message="Invalid credentials.")
+
+
+@blp_users.route("/refresh")
+class TokenRefresh(MethodView):
+    @jwt_required(refresh=True)
+    def post(self):
+        new_access_token = create_access_token(identity=get_jwt_identity())
+        add_token_to_database(new_access_token)
+        return (
+            jsonify(
+                {
+                    "access_token": new_access_token,
+                    "message": "New access token created.",
+                }
+            ),
+            200,
+        )
+
+
+@blp_users.route("/logout")
+class UserLogout(MethodView):
+    @jwt_required()
+    def delete(self):
+        """
+        Log out the user.
+        """
+        payload = get_jwt()  # TODO
+        jti = payload["jti"]
+        user_identity = payload["sub"]
+        revoke_jti_token(jti, user_identity)
+        return jsonify({"message": "Successfully logged out. JWT revoked."}), 200
+
+
 @blp_users.route("/user/<int:user_id>")
 class User(MethodView):
     """
@@ -92,48 +146,3 @@ class User(MethodView):
         db.session.delete(user)
         db.session.commit()
         return {"message": "User deleted."}, 200
-
-
-@blp_users.route("/login")
-class UserLogin(MethodView):
-    @blp_users.arguments(UserSchema)
-    def post(self, user_data):
-        """Log in the user."""
-        user = UserModel.query.filter(
-            UserModel.username == user_data["username"]
-        ).first()
-
-        if user and pbkdf2_sha256.verify(user_data["password"], user.password):
-            access_token = create_access_token(identity=user.id, fresh=True)
-            refresh_token = create_refresh_token(identity=user.id)
-            return {
-                "access_token": access_token,
-                "refresh_token": refresh_token,
-                "message": "Successfully logged in. Access token created.",
-            }, 200
-
-        abort(401, message="Invalid credentials.")
-
-
-@blp_users.route("/logout")
-class UserLogout(MethodView):
-    @jwt_required()
-    def post(self):
-        """Log out the user."""
-        jti = get_jwt()["jti"]
-        now = datetime.now(timezone.utc)
-        db.session.add(TokenBlocklistModel(jti=jti, created_at=now))
-        db.session.commit()
-        return {"message": "Successfully logged out. JWT revoked."}, 200
-
-
-@blp_users.route("/refresh")
-class TokenRefresh(MethodView):
-    @jwt_required(refresh=True)
-    def post(self):
-        new_token = create_access_token(identity=get_jwt_identity(), fresh=False)
-        jti = get_jwt()["jti"]
-        now = datetime.now(timezone.utc)
-        db.session.add(TokenBlocklistModel(jti=jti, created_at=now))
-        db.session.commit()
-        return {"access_token": new_token, "message": "New token created."}

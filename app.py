@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 import os
 
 from flask import Flask, jsonify
@@ -15,14 +13,13 @@ from resources.bakeries import blp_bakeries as BakeriesSegmentBlueprint
 from resources.tags import blp_tags as TagsSegmentBlueprint
 from resources.user import blp_users as UserBlueprint
 
+from models.user_model import UserModel
 from models.tokenblocklist_model import TokenBlocklistModel
-
-
-JWT_ACCESS_EXPIRES = timedelta(minutes=5)
 
 
 def create_app(db_url=None):
     app = Flask(__name__)
+
     load_dotenv()
 
     app.config["PROPAGATE_EXCEPTIONS"] = True
@@ -49,27 +46,38 @@ def create_app(db_url=None):
         db.create_all()
 
     app.config["JWT_SECRET_KEY"] = "16890974721412720643745332657034989076"
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = JWT_ACCESS_EXPIRES
+    app.config["JWT_BLACKLIST_ENABLED"] = True
+    app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access"]
+
     jwt = JWTManager(app)
 
     @jwt.additional_claims_loader
     def add_claims_to_jwt(identity):
         return {"is_admin": identity == 1}
 
+    @jwt.user_lookup_loader
+    def user_loader_callback(jwt_headers, jwt_payload):
+        identity = jwt_payload["sub"]
+        return UserModel.query.get(identity)
+
     @jwt.token_in_blocklist_loader
-    def check_if_token_in_blocklist(jwt_header, jwt_payload):
+    def check_if_token_is_revoked(jwt_header, jwt_payload):
         """
-        Check whether any JWT received is in the blocklist.
+        Check whether any JWT received is in the blocklist and token revoked.
         """
         jti = jwt_payload["jti"]
-        token = db.session.query(TokenBlocklistModel.id).filter_by(jti=jti).scalar()
-        return token is not None
+        return TokenBlocklistModel.is_jti_blacklisted(jti)
 
     @jwt.revoked_token_loader
     def revoked_token_callback(jwt_header, jwt_payload):
         return (
             jsonify(
-                {"description": "The token has been revoked.", "error": "token_revoked"}
+                {
+                    "description": "The token has been revoked.",
+                    "error": "token_revoked",
+                    "jwt_header": jwt_header,
+                    "jwt_payload": jwt_payload,
+                }
             ),
             401,
         )
@@ -84,7 +92,14 @@ def create_app(db_url=None):
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return (
-            jsonify({"message": "The token has expired.", "error": "token_expired"}),
+            jsonify(
+                {
+                    "message": "The token has expired.",
+                    "error": "token_expired",
+                    "jwt_header": jwt_header,
+                    "jwt_payload": jwt_payload,
+                }
+            ),
             400,
         )
 
