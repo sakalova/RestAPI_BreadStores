@@ -121,7 +121,7 @@ class UserLogout(MethodView):
         """
         Log out the user.
         """
-        payload = get_jwt()  # TODO
+        payload = get_jwt()
         jti = payload["jti"]
         user_identity = payload["sub"]
         revoke_jti_token(jti, user_identity)
@@ -142,6 +142,7 @@ class User(MethodView):
         return user
 
     def delete(self, user_id):
+        """Delete requested user."""
         user = UserModel.query.get_or_404(user_id)
         db.session.delete(user)
         db.session.commit()
