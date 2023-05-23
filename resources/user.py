@@ -14,15 +14,17 @@ from flask_jwt_extended import (
 from passlib.hash import pbkdf2_sha256
 
 from db import db
-from models import UserModel
+from models.user_model import UserModel
 
 from schemas import UserSchema, UserRegisterSchema
 from emails import send_user_registration_email
 from sqlalchemy import or_
-from rq import Queue
+from rq.queue import Queue
 from dotenv import load_dotenv
 
 from utilities.token import add_token_to_database, revoke_jti_token
+
+from typing import Tuple, Dict, Any
 
 
 load_dotenv()
@@ -42,7 +44,7 @@ queue = Queue("emails", connection=connection)
 @blp_users.route("/register")
 class UserRegister(MethodView):
     @blp_users.arguments(UserRegisterSchema)
-    def post(self, user_data):
+    def post(self, user_data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         """Create a new user and add to database."""
         if UserModel.query.filter(
             or_(
@@ -69,7 +71,7 @@ class UserRegister(MethodView):
 @blp_users.route("/login")
 class UserLogin(MethodView):
     @blp_users.arguments(UserSchema)
-    def post(self, user_data):
+    def post(self, user_data: Dict[str, str]) -> Tuple[Dict[str, str], int]:
         """Log in the user."""
         username = user_data["username"]
         password = user_data["password"]
@@ -83,41 +85,31 @@ class UserLogin(MethodView):
             add_token_to_database(access_token)
             add_token_to_database(refresh_token)
 
-            return (
-                jsonify(
-                    {
-                        "access_token": access_token,
-                        "refresh_token": refresh_token,
-                        "message": "Successfully logged in. Access token created.",
-                    }
-                ),
-                200,
-            )
+            return {
+                    "access_token": access_token,
+                    "refresh_token": refresh_token,
+                    "message": "Successfully logged in. Access token created.",
+                    }, 200
 
         abort(401, message="Invalid credentials.")
 
 
 @blp_users.route("/refresh")
 class TokenRefresh(MethodView):
-    @jwt_required(refresh=True)
-    def post(self):
+    @jwt_required(refresh=True)  # type: ignore
+    def post(self) -> Tuple[Dict[str, str], int]:
         new_access_token = create_access_token(identity=get_jwt_identity())
         add_token_to_database(new_access_token)
-        return (
-            jsonify(
-                {
-                    "access_token": new_access_token,
-                    "message": "New access token created.",
-                }
-            ),
-            200,
-        )
+        return {
+            "access_token": new_access_token,
+            "message": "New access token created.",
+        }, 200
 
 
 @blp_users.route("/logout")
 class UserLogout(MethodView):
-    @jwt_required()
-    def delete(self):
+    @jwt_required()  # type: ignore
+    def delete(self) -> Tuple[Dict[str, str], int]:
         """
         Log out the user.
         """
@@ -125,7 +117,7 @@ class UserLogout(MethodView):
         jti = payload["jti"]
         user_identity = payload["sub"]
         revoke_jti_token(jti, user_identity)
-        return jsonify({"message": "Successfully logged out. JWT revoked."}), 200
+        return {"message": "Successfully logged out. JWT revoked."}, 200
 
 
 @blp_users.route("/user/<int:user_id>")
@@ -136,12 +128,11 @@ class User(MethodView):
     """
 
     @blp_users.response(200, UserSchema)
-    def get(self, user_id):
+    def get(self, user_id: str) -> Any:
         """Get requested user."""
-        user = UserModel.query.get_or_404(user_id)
-        return user
+        return UserModel.query.get_or_404(user_id)
 
-    def delete(self, user_id):
+    def delete(self, user_id: str) -> Tuple[Dict[str, str], int]:
         """Delete requested user."""
         user = UserModel.query.get_or_404(user_id)
         db.session.delete(user)

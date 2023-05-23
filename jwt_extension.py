@@ -1,25 +1,34 @@
 from flask import jsonify
 from flask_jwt_extended import JWTManager
+from flask import make_response, Response
 
-from models import TokenBlocklistModel, UserModel
+from models.tokenblocklist_model import TokenBlocklistModel
+from models.user_model import UserModel
+
+from typing import Dict
 
 
 jwt = JWTManager()
 
 
 @jwt.additional_claims_loader
-def add_claims_to_jwt(identity):
+def add_claims_to_jwt(identity: int) -> Dict[str, bool]:
     return {"is_admin": identity == 1}
 
 
 @jwt.user_lookup_loader
-def user_loader_callback(jwt_headers, jwt_payload):
+def user_loader_callback(
+    jwt_header: Dict[str, str], jwt_payload: Dict[str, int | str | bool]
+) -> UserModel:
     identity = jwt_payload["sub"]
-    return UserModel.query.get(identity)
+    user: UserModel = UserModel.query.get(identity)
+    return user
 
 
 @jwt.token_in_blocklist_loader
-def check_if_token_is_revoked(jwt_header, jwt_payload):
+def check_if_token_is_revoked(
+    jwt_header: Dict[str, str], jwt_payload: Dict[str, int | str | bool]
+) -> bool:
     """
     Check whether any JWT received is in the blocklist and token revoked.
     """
@@ -28,8 +37,10 @@ def check_if_token_is_revoked(jwt_header, jwt_payload):
 
 
 @jwt.revoked_token_loader
-def revoked_token_callback(jwt_header, jwt_payload):
-    return (
+def revoked_token_callback(
+    jwt_header: Dict[str, str], jwt_payload: Dict[str, int | str | bool]
+) -> Response:
+    resp = make_response(
         jsonify(
             {
                 "description": "The token has been revoked.",
@@ -40,18 +51,27 @@ def revoked_token_callback(jwt_header, jwt_payload):
         ),
         401,
     )
+    return resp
 
 
 @jwt.needs_fresh_token_loader
-def token_not_fresh_callback(jwt_header, jwt_payload):
-    return jsonify(
-        {"description": "The token is not fresh.", "error": "fresh_token_required"}
+def token_not_fresh_callback(
+    jwt_header: Dict[str, str], jwt_payload: Dict[str, int | str | bool]
+) -> Response:
+    resp = make_response(
+        jsonify(
+            {"description": "The token is not fresh.", "error": "fresh_token_required"}
+        ),
+        400,
     )
+    return resp
 
 
 @jwt.expired_token_loader
-def expired_token_callback(jwt_header, jwt_payload):
-    return (
+def expired_token_callback(
+        jwt_header: Dict[str, str], jwt_payload: Dict[str, int | str | bool]
+) -> Response:
+    resp = make_response(
         jsonify(
             {
                 "message": "The token has expired.",
@@ -62,24 +82,25 @@ def expired_token_callback(jwt_header, jwt_payload):
         ),
         400,
     )
+    return resp
 
 
 @jwt.invalid_token_loader
-def invalid_token_callback(error):
-    return (
+def invalid_token_callback(error) -> Response:
+    resp = make_response(
         jsonify({"message": "Signature verification failed", "error": "invalid_token"}),
-        401,
+        401
     )
+    return resp
 
 
 @jwt.unauthorized_loader
-def missing_token_callback(error):
-    return (
-        jsonify(
-            {
-                "description": "Request does not contain an access token.",
-                "error": "authorization_required",
-            }
-        ),
-        401,
+def missing_token_callback(error) -> Response:
+    resp = make_response(
+        {
+            "description": "Request does not contain an access token.",
+            "error": "authorization_required",
+        },
+        401
     )
+    return resp

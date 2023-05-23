@@ -1,7 +1,7 @@
 from db import db
 
 
-class TokenBlocklistModel(db.Model):
+class TokenBlocklistModel(db.Model):   # type: ignore
     __tablename__ = "blocklist_tokens"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,7 +15,7 @@ class TokenBlocklistModel(db.Model):
     user = db.relationship("UserModel", lazy="joined")
 
     @classmethod
-    def is_jti_blacklisted(cls, jti):
+    def is_jti_blacklisted(cls, jti: str) -> bool:
         """
         Checking if token is blacklisted.
         """

@@ -7,7 +7,7 @@ from models.bakery_model import BakeryModel
 from models.tag_model import TagModel
 from models.bread_model import BreadModel
 from db import db
-from typing import Any
+from typing import Any, Dict, List
 
 
 blp_tags = Blueprint("Tags", "tags", description="Operations on tags.")
@@ -18,10 +18,11 @@ class TagsInBakery(MethodView):
     """Segment related to the requested bakery tags."""
 
     @blp_tags.response(200, TagSchema(many=True))
-    def get(self, bakery_id: int):
+    def get(self, bakery_id: int) -> List[TagModel]:
         """Get all tags of the requested bakery."""
         bakery = BakeryModel.query.get_or_404(bakery_id)
-        return bakery.tags.all()
+        all_tags: List[TagModel] = bakery.tags.all()
+        return all_tags
 
     @blp_tags.arguments(TagSchema)
     @blp_tags.response(200, TagSchema)
@@ -47,9 +48,9 @@ class Tag(MethodView):
     """Segment related to the requested bakery tags."""
 
     @blp_tags.response(201, TagSchema)
-    def get(self, tag_id: int):
+    def get(self, tag_id: int) -> TagModel:
         """Get the requested tag."""
-        tag = TagModel.query.get_or_404(tag_id)
+        tag: TagModel = TagModel.query.get_or_404(tag_id)
         return tag
 
     @blp_tags.response(
@@ -62,7 +63,7 @@ class Tag(MethodView):
         400,
         description="Returned if the tag is assigned to one or more breads. In this case, the tag is not deleted.",
     )
-    def delete(self, tag_id: int):
+    def delete(self, tag_id: int) -> Dict[str, str]:
         """Delete the requested tag itself if it is not associated with any breads."""
         tag = TagModel.query.get_or_404(tag_id)
 
@@ -81,10 +82,10 @@ class LinkTagsToItem(MethodView):
     """Segment related to tags and breads that are related."""
 
     @blp_tags.response(201, TagSchema)
-    def post(self, bread_id: int, tag_id: int):
+    def post(self, bread_id: int, tag_id: int) -> TagModel:
         """Add a tag to a bread."""
         bread = BreadModel.query.get_or_404(bread_id)
-        tag = TagModel.query.get_or_404(tag_id)
+        tag: TagModel = TagModel.query.get_or_404(tag_id)
 
         bread.tags.append(tag)
 
@@ -97,7 +98,7 @@ class LinkTagsToItem(MethodView):
         return tag
 
     @blp_tags.response(200, TagAndBreadSchema)
-    def delete(self, bread_id: int, tag_id: int):
+    def delete(self, bread_id: int, tag_id: int) -> Dict[str, str]:
         """Delete tag from bread."""
         bread = BreadModel.query.get_or_404(bread_id)
         tag = TagModel.query.get_or_404(tag_id)

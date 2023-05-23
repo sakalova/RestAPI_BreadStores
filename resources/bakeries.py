@@ -6,6 +6,8 @@ from schemas import BakerySchema
 from models.bakery_model import BakeryModel
 from db import db
 
+from typing import Dict, List, Tuple
+
 
 blp_bakeries = Blueprint("Bakeries", "bakeries", description="Operations on bakeries.")
 
@@ -13,12 +15,11 @@ blp_bakeries = Blueprint("Bakeries", "bakeries", description="Operations on bake
 @blp_bakeries.route("/bakeries/<string:bakery_id>")
 class Bakery(MethodView):
     @blp_bakeries.response(200, BakerySchema)
-    def get(self, bakery_id):
+    def get(self, bakery_id: str):
         """Get requested bakery."""
-        bakery = BakeryModel.query.get_or_404(bakery_id)
-        return bakery
+        return BakeryModel.query.get_or_404(bakery_id)
 
-    def delete(self, bakery_id):
+    def delete(self, bakery_id: str) -> Tuple[Dict[str, str | int], int]:
         """Delete requested bakery."""
         bakery = BakeryModel.query.get_or_404(bakery_id)
         db.session.delete(bakery)
@@ -33,13 +34,14 @@ class Bakery(MethodView):
 @blp_bakeries.route("/bakeries")
 class Bakeries(MethodView):
     @blp_bakeries.response(200, BakerySchema(many=True))
-    def get(self):
+    def get(self) -> List[BakeryModel]:
         """Get list of all bakeries."""
-        return BakeryModel.query.all()
+        all_bakeries = BakeryModel.query.all()
+        return all_bakeries
 
     @blp_bakeries.arguments(BakerySchema)
     @blp_bakeries.response(201, BakerySchema)
-    def post(self, store_data):
+    def post(self, store_data: Dict[str, str]) -> BakeryModel:
         """Create a new bakery and add it to database."""
         bakery = BakeryModel(**store_data)
         try:

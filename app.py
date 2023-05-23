@@ -15,7 +15,7 @@ from resources.user import blp_users as UserBlueprint
 from jwt_extension import jwt
 
 
-def create_app(db_url=None):
+def create_app(db_url: str | None = None) -> Flask:
     app = Flask(__name__)
 
     load_dotenv()

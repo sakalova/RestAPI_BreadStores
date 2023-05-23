@@ -1,8 +1,6 @@
 import os
 
 import requests
-from requests import PreparedRequest
-from requests.auth import AuthBase
 
 from dotenv import load_dotenv
 import jinja2
@@ -15,13 +13,6 @@ load_dotenv()
 MAILGUN_BASE_URL = "https://api.mailgun.net/v3"
 MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
 MAILGUN_DOMAIN_NAME = os.getenv("MAILGUN_DOMAIN_NAME")
-
-# # checkers
-# if MAILGUN_API_KEY is None:
-#     raise ValueError("Mailgun api key must not be None")
-#
-# if MAILGUN_DOMAIN_NAME is None:
-#     raise ValueError("Mailgun domain name must not be None")
 
 
 AUTH = ("api", MAILGUN_API_KEY)
@@ -45,7 +36,7 @@ def send_message(to: str, subject: str, text: str, html: str) -> requests.Respon
         "html": html,
     }
 
-    return requests.post(url, auth=AUTH, data=data)
+    return requests.post(url, auth=AUTH, data=data)  # type: ignore
 
 
 def send_user_registration_email(email: str, username: str):

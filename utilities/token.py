@@ -6,10 +6,10 @@ from db import db
 from sqlalchemy.orm.exc import NoResultFound
 
 from flask_jwt_extended import decode_token
-from models import TokenBlocklistModel
+from models.tokenblocklist_model import TokenBlocklistModel
 
 
-def add_token_to_database(encoded_token):
+def add_token_to_database(encoded_token: str) -> None:
     """
     Function adds provided token to blocklist_tokens table in database.
     """
@@ -33,7 +33,7 @@ def add_token_to_database(encoded_token):
     db.session.commit()
 
 
-def revoke_jti_token(token_jti, user_identity):
+def revoke_jti_token(token_jti: str, user_identity: int) -> None:
     """
     Revokes given token.
     Using it only on logout.

@@ -5,10 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01c25a7e-e181-4cff-ab19-46b599ca507e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/jwt_extension.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/emails.py" beforeDir="false" afterPath="$PROJECT_DIR$/emails.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jwt_extension.py" beforeDir="false" afterPath="$PROJECT_DIR$/jwt_extension.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/tokenblocklist_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/tokenblocklist_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/bakeries.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/bakeries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/breads.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/breads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/schemas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utilities/token.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities/token.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,24 +111,39 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/emails.py</url>
+          <line>25</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/resources/user.py</url>
-          <line>127</line>
-          <option name="timeStamp" value="7" />
+          <line>48</line>
+          <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/models/tokenblocklist_model.py</url>
-          <line>21</line>
-          <option name="timeStamp" value="12" />
+          <url>file://$PROJECT_DIR$/resources/user.py</url>
+          <line>56</line>
+          <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utilities/token.py</url>
-          <line>15</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/resources/tags.py</url>
+          <line>53</line>
+          <option name="timeStamp" value="28" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utilities/token.py</url>
-          <line>41</line>
-          <option name="timeStamp" value="14" />
+          <url>file://$PROJECT_DIR$/resources/bakeries.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/jwt_extension.py</url>
+          <line>35</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/resources/breads.py</url>
+          <line>23</line>
+          <option name="timeStamp" value="38" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
