@@ -34,21 +34,19 @@ def create_app(db_url: str | None = None) -> Flask:
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["PROPAGATE_EXCEPTIONS"] = True
-
-    db.init_app(app)
-    migrate = Migrate(app, db)
-
-    api = Api(app)
-
-    with app.app_context():
-        db.create_all()
-
     app.config["JWT_SECRET_KEY"] = "16890974721412720643745332657034989076"
     app.config["JWT_BLACKLIST_ENABLED"] = True
     app.config["JWT_BLACKLIST_TOKEN_CHECKS"] = ["access"]
 
+    db.init_app(app)
+    migrate = Migrate(app, db)
+
+    with app.app_context():
+        db.create_all()
+
     jwt.init_app(app)
 
+    api = Api(app)
     api.register_blueprint(UserBlueprint)
     api.register_blueprint(BreadsSegmentBlueprint)
     api.register_blueprint(BakeriesSegmentBlueprint)

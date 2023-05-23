@@ -1,7 +1,6 @@
 import os
 import redis
 
-from flask import jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (

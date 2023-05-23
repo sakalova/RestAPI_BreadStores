@@ -1,11 +1,8 @@
 import os
-
 import requests
 
 from dotenv import load_dotenv
 import jinja2
-
-from typing import Optional, Union, Tuple, Callable
 
 
 load_dotenv()
