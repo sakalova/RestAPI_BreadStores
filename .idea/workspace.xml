@@ -5,12 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="01c25a7e-e181-4cff-ab19-46b599ca507e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Insomnia_2023-05-16.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/emails.py" beforeDir="false" afterPath="$PROJECT_DIR$/emails.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jwt_extension.py" beforeDir="false" afterPath="$PROJECT_DIR$/jwt_extension.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/bakeries.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/bakeries.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/breads.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/breads.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/tags.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/tags.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utilities/token.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilities/token.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,9 +82,9 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="FLASK_APP" value="app.py" />
         <env name="FLASK_DEBUG" value="1" />
-        <env name="PYTHONUNBUFFERED" value="1" />
         <env name="FLASK_ENV" value="developement" />
       </envs>
       <option name="SDK_HOME" value="" />
@@ -133,7 +138,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/emails.py</url>
-          <line>22</line>
+          <line>21</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -143,7 +148,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/resources/bakeries.py</url>
-          <line>49</line>
+          <line>48</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

@@ -1,30 +1,21 @@
 import os
-import redis
+from typing import Any, Dict, Tuple
 
+import redis
+from dotenv import load_dotenv
 from flask.views import MethodView
+from flask_jwt_extended import (create_access_token, create_refresh_token,
+                                get_jwt, get_jwt_identity, jwt_required)
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
-    get_jwt,
-    get_jwt_identity,
-    jwt_required,
-)
 from passlib.hash import pbkdf2_sha256
+from rq.queue import Queue
+from sqlalchemy import or_
 
 from db import db
-from models.user_model import UserModel
-
-from schemas import UserSchema, UserRegisterSchema
 from emails import send_user_registration_email
-from sqlalchemy import or_
-from rq.queue import Queue
-from dotenv import load_dotenv
-
+from models.user_model import UserModel
+from schemas import UserRegisterSchema, UserSchema
 from utilities.token import add_token_to_database, revoke_jti_token
-
-from typing import Tuple, Dict, Any
-
 
 load_dotenv()
 

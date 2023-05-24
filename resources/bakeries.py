@@ -1,13 +1,12 @@
-from flask.views import MethodView
-from flask_smorest import Blueprint, abort
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-
-from schemas import BakerySchema
-from models.bakery_model import BakeryModel
-from db import db
-
 from typing import Dict, List, Tuple
 
+from flask.views import MethodView
+from flask_smorest import Blueprint, abort
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from db import db
+from models.bakery_model import BakeryModel
+from schemas import BakerySchema
 
 blp_bakeries = Blueprint("Bakeries", "bakeries", description="Operations on bakeries.")
 

@@ -1,12 +1,9 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 from db import db
-
-from sqlalchemy.orm.exc import NoResultFound
-
 from flask_jwt_extended import decode_token
 from models.tokenblocklist_model import TokenBlocklistModel
+from sqlalchemy.orm.exc import NoResultFound
 
 
 def add_token_to_database(encoded_token: str) -> None:

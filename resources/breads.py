@@ -1,13 +1,13 @@
+from typing import Dict, Tuple
+
 from flask.views import MethodView
+from flask_jwt_extended import get_jwt, jwt_required
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import jwt_required, get_jwt
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from schemas import BreadSchema, BreadUpdateSchema
-from models.bread_model import BreadModel
 from db import db
-from typing import Tuple, Dict
-
+from models.bread_model import BreadModel
+from schemas import BreadSchema, BreadUpdateSchema
 
 blp_breads = Blueprint("Breads", "breads", description="Operations on all breads")
 

@@ -1,12 +1,10 @@
-from flask import jsonify
+from typing import Dict
+
+from flask import Response, jsonify, make_response
 from flask_jwt_extended import JWTManager
-from flask import make_response, Response
 
 from models.tokenblocklist_model import TokenBlocklistModel
 from models.user_model import UserModel
-
-from typing import Dict
-
 
 jwt = JWTManager()
 

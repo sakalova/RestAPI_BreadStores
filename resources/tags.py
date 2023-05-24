@@ -1,14 +1,14 @@
+from typing import Any, Dict, List
+
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
 
-from schemas import TagSchema, TagAndBreadSchema
-from models.bakery_model import BakeryModel
-from models.tag_model import TagModel
-from models.bread_model import BreadModel
 from db import db
-from typing import Any, Dict, List
-
+from models.bakery_model import BakeryModel
+from models.bread_model import BreadModel
+from models.tag_model import TagModel
+from schemas import TagAndBreadSchema, TagSchema
 
 blp_tags = Blueprint("Tags", "tags", description="Operations on tags.")
 

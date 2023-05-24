@@ -1,18 +1,16 @@
 import os
 
+from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
 from flask_smorest import Api
 
 from db import db
-from dotenv import load_dotenv
-
-from resources.breads import blp_breads as BreadsSegmentBlueprint
+from jwt_extension import jwt
 from resources.bakeries import blp_bakeries as BakeriesSegmentBlueprint
+from resources.breads import blp_breads as BreadsSegmentBlueprint
 from resources.tags import blp_tags as TagsSegmentBlueprint
 from resources.user import blp_users as UserBlueprint
-
-from jwt_extension import jwt
 
 
 def create_app(db_url: str | None = None) -> Flask:
